@@ -158,6 +158,7 @@ void            uartputc_sync(int);
 int             uartgetc(void);
 
 // vm.c
+//extern char etext[];  // kernel.ld sets this to end of kernel code.
 void            kvminit(void);
 void            kvminithart(void);
 uint64          kvmpa(uint64);
@@ -167,11 +168,20 @@ pagetable_t     uvmcreate(void);
 void            uvminit(pagetable_t, uchar *, uint);
 uint64          uvmalloc(pagetable_t, uint64, uint64);
 uint64          uvmdealloc(pagetable_t, uint64, uint64);
+void            vmprint(pagetable_t);
+pagetable_t     kvmmake();
+pte_t *         walk(pagetable_t , uint64, int);
+//vmcopyin.c
+int             copyin_new(pagetable_t,char *,uint64,uint64);
+int             copyinstr_new(pagetable_t,char *,uint64,uint64);
+
+
 #ifdef SOL_COW
 #else
 int             uvmcopy(pagetable_t, pagetable_t, uint64);
 #endif
 void            uvmfree(pagetable_t, uint64);
+void            uvmfree2(pagetable_t, uint64,uint);
 void            uvmunmap(pagetable_t, uint64, uint64, int);
 void            uvmclear(pagetable_t, uint64);
 uint64          walkaddr(pagetable_t, uint64);
