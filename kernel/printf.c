@@ -138,7 +138,7 @@ void backtrace(){
   uint64 up = PGROUNDUP((uint64)fp);
   uint64* ra;
   printf("backtrace:\n");
-  while ((uint64)fp!=up)
+  while ((uint64)fp != up)
   {
     fp = (uint64*)((uint64)fp - 16);
     ra = (uint64*)((uint64)fp + 8);
