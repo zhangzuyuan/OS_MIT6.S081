@@ -16,6 +16,9 @@ struct entry {
 struct entry *table[NBUCKET];
 int keys[NKEYS];
 int nthread = 1;
+//定义互斥锁
+pthread_mutex_t lock[NBUCKET];
+//pthread_mutex_t lock;
 
 double
 now()
@@ -39,6 +42,8 @@ static
 void put(int key, int value)
 {
   int i = key % NBUCKET;
+  //对数组某个bucket加锁
+  pthread_mutex_lock(&lock[i]); //acquire lock
 
   // is the key already present?
   struct entry *e = 0;
@@ -53,6 +58,8 @@ void put(int key, int value)
     // the new is new.
     insert(key, value, &table[i], table[i]);
   }
+  //添加的
+  pthread_mutex_unlock(&lock[i]);
 }
 
 static struct entry*
@@ -76,7 +83,13 @@ put_thread(void *xa)
   int b = NKEYS/nthread;
 
   for (int i = 0; i < b; i++) {
+    //对put操作加锁
+    //pthread_mutex_lock(&lock);
+    //
     put(keys[b*n + i], n);
+    //
+    //pthread_mutex_unlock(&lock);
+    //
   }
 
   return NULL;
@@ -114,6 +127,13 @@ main(int argc, char *argv[])
   for (int i = 0; i < NKEYS; i++) {
     keys[i] = random();
   }
+
+  //初始化互斥锁
+  //pthread_mutex_init(&lock, NULL);
+  for (int i = 0; i < NBUCKET; i++){
+    pthread_mutex_init(&lock[i], NULL);
+  }
+  
 
   //
   // first the puts
