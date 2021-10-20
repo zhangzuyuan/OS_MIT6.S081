@@ -69,7 +69,9 @@ usertrap(void)
     // ok
   }
   else if(r_scause() == 13 || r_scause()==15){
-    // uint64 stval =r_stval();
+    //13读缺页，15写缺页
+    //发生缺页异常时候，给虚拟地址分配物理页
+    // uint64 stval =r_stval();//导致page fault 的虚拟地址
     // char *mem = kalloc();
     // if(mem == 0){
     //   p->killed = 1;

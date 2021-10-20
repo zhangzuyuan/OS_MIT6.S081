@@ -185,6 +185,7 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
     if((pte = walk(pagetable, a, 0)) == 0)
       continue;//panic("uvmunmap: walk");
     if((*pte & PTE_V) == 0)
+    //进程销毁时候，对于尚未分配实际物理页的虚拟地址，不做任何处理
       continue;//panic("uvmunmap: not mapped");
     if(PTE_FLAGS(*pte) == PTE_V)
       panic("uvmunmap: not a leaf");
@@ -387,6 +388,7 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
       if(dstva >= myproc()->sz){
         return -1;
       }
+      //write方法将会用到尚未分配物理页的虚拟地址，在copyout中分配物理页。
       char *mem = kalloc();
       pa0 = (uint64)mem;
       memset(mem,0,PGSIZE);
@@ -441,6 +443,7 @@ copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
       if(srcva >= myproc()->sz){
         return -1;
       }
+      //read方法将会用到尚未分配物理页的虚拟地址，在copyin中分配物理页。
       char *mem = kalloc();
       pa0 = (uint64)mem;
       memset(mem,0,PGSIZE);
