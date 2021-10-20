@@ -504,7 +504,7 @@ static void traversal_pt(pagetable_t pagetable,int level){
   {
     pte_t pte = pagetable[i];
     if(pte & PTE_V){
-      uint64 child = PTE2PA(pte);
+      uint64 child = PTE2PA(pte);//将pte中的地址移动到正确的物理地址
       if(level == 0){
         printf("..%d: pte %p pa %p\n",i,pte,child);
         traversal_pt((pagetable_t)child,level+1);
