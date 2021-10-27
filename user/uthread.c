@@ -20,7 +20,7 @@
 struct thread {
   char       stack[STACK_SIZE]; /* the thread's stack */
   int        state;             /* FREE, RUNNING, RUNNABLE */
-  struct  context threadContext;
+  struct  context threadContext; //线程切换时保存恢复寄存器信息
 
 };
 struct thread all_thread[MAX_THREAD];
@@ -71,7 +71,7 @@ thread_schedule(void)
      * Invoke thread_switch to switch from t to next_thread:
      * thread_switch(??, ??);
      */
-    //添加的
+    //添加的 保存线程上下文，
     thread_switch(&t->threadContext,&current_thread->threadContext);
   } else
     next_thread = 0;
@@ -88,6 +88,7 @@ thread_create(void (*func)())
   t->state = RUNNABLE;
   // YOUR CODE HERE
 
+  //保证栈指针位于栈顶
   t->threadContext.ra = (uint64)func;
   t->threadContext.sp = (uint64)(t->stack) + STACK_SIZE;
 }
