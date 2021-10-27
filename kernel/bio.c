@@ -23,7 +23,7 @@
 #include "fs.h"
 #include "buf.h"
 
-#define NBUC 13
+#define NBUC  13 //hash表的bucket数量
 
 struct {
   struct spinlock lock;
@@ -35,7 +35,7 @@ struct {
   //struct buf head;
 } bcache;
 
-struct bMem{
+struct bMem{//作为hash表
   struct spinlock lock;
   struct buf head;
 };
@@ -68,6 +68,7 @@ binit(void)
   //   bcache.head.next->prev = b;
   //   bcache.head.next = b;
   // }
+  //哈希表中每个bucket lock 的初始化
   for(int i = 0; i < NBUC;i++){
     initlock(&(hashTable[i].lock),"bcache.bucket");
   }
@@ -141,11 +142,11 @@ bget(uint dev, uint blockno)
 	    		lruBuf = b;
 	    		continue;
 	    	}
-			if (b->tick < lruBuf->tick){
-				lruBuf = b;
-			}
+			  if (b->tick < lruBuf->tick){
+			  	lruBuf = b;
+			  }
 	    }
-  	}
+  }
 
 	if (lruBuf){
 	  uint64 oldTick = lruBuf->tick;
@@ -177,6 +178,7 @@ bget(uint dev, uint blockno)
 	}
   	panic("bget: no buffers");
 }
+
 
 
 // Return a locked buf with the contents of the indicated block.

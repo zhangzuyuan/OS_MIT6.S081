@@ -35,6 +35,7 @@ void
 kinit()
 {
   //initlock(&kmem.lock, "kmem");
+  //对NCPU个kmem结构体进行初始化
   for (int i = 0; i < NCPU; i++)
   {
     initlock(&(kemArray[i].lock),"kmem");
@@ -74,8 +75,9 @@ kfree(void *pa)
   // kmem.freelist = r;
   // release(&kmem.lock);
 
-  push_off();
-  int cpuId = cpuid();
+  push_off();//关闭中断
+  int cpuId = cpuid();//获取当前cpu的编号
+  //释放对应的freelist
   acquire(&(kemArray[cpuId].lock));
   r->next = kemArray[cpuId].freelist;
   kemArray[cpuId].freelist = r;
@@ -97,6 +99,7 @@ kalloc(void)
   //   kmem.freelist = r->next;
   // release(&kmem.lock);
 
+  //当前的CPU的freelist（可利用空间表）为空时候，从其他的CPU的list处获取
   push_off();
   int cpuId = cpuid();
   acquire(&(kemArray[cpuId].lock));
